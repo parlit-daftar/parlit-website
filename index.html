@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parlit | فرۆشگای دەفتەری ئەرکەکان</title>
+    <link rel="icon" type="image/jpeg" href="logo.jpg.JPG">
+    <style>
+        :root {
+            --bg-color: #0f1016;
+            --card-bg: #1a1c24;
+            --accent: #d4af37;
+            --text-light: #f5f5f7;
+            --text-gray: #a0a0ab;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+        header {
+            background: linear-gradient(135deg, #1f222e 0%, #0f1016 100%);
+            padding: 35px 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--accent);
+            position: relative;
+        }
+
+        /* دوگمەی ٣ هێڵ لە سەرەوە لای ڕاست */
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1100;
+            background: var(--card-bg);
+            border: 2px solid var(--accent);
+            border-radius: 10px;
+            width: 46px;
+            height: 46px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            transition: 0.3s;
+        }
+        .menu-btn:hover {
+            transform: scale(1.05);
+            background: #252836;
+        }
+        .menu-btn span {
+            display: block;
+            width: 24px;
+            height: 2.5px;
+            background-color: var(--accent);
+            border-radius: 2px;
+            transition: 0.3s;
+        }
+
+        /* مێنوی لاوەکی (Sidebar Menu) */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1200;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+        .sidebar-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 280px;
+            height: 100%;
+            background: var(--card-bg);
+            border-left: 2px solid var(--accent);
+            z-index: 1300;
+            padding: 25px 20px;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -5px 0 25px rgba(0,0,0,0.8);
+        }
+        .sidebar-menu.active {
+            right: 0;
+        }
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .sidebar-header h3 {
+            color: var(--accent);
+            font-size: 1.3rem;
+        }
+        .close-sidebar {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.8rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .social-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #14161f;
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid #2a2d3a;
+            font-weight: bold;
+            font-size: 1.05rem;
+            transition: 0.3s;
+        }
+        .social-link:hover {
+            border-color: var(--accent);
+            background: rgba(212, 175, 55, 0.1);
+            transform: translateX(-5px);
+        }
+        .social-link span.badge {
+            background: var(--accent);
+            color: #000;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        .brand-logo {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            background-color: #ffffff;
+            border-radius: 50%;
+            padding: 8px;
+            border: 3px solid var(--accent);
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.35);
+            margin-bottom: 12px;
+            transition: transform 0.3s ease;
+        }
+        .brand-logo:hover {
+            transform: scale(1.05);
+        }
+        header h1 {
+            font-size: 2.4rem;
+            color: var(--accent);
+            letter-spacing: 4px;
+            margin-bottom: 8px;
+        }
+        header p {
+            color: var(--text-gray);
+            font-size: 1.05rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        #admin-panel {
+            display: none;
+            background: #232634;
+            border: 2px solid var(--accent);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 40px;
+        }
+        #admin-panel h2 {
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-gray);
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #14161f;
+            color: #fff;
+            font-size: 1rem;
+        }
+        .admin-btn {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-left: 10px;
+        }
+        .export-box {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #444;
+        }
+        .categories {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .cat-btn {
+            background: var(--card-bg);
+            color: var(--text-light);
+            border: 1px solid #333;
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: 0.3s;
+        }
+        .cat-btn.active, .cat-btn:hover {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+            font-weight: bold;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            transition: transform 0.3s ease;
+            border: 1px solid #2a2d3a;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .card:hover {
+            transform: translateY(-7px);
+            border-color: var(--accent);
+        }
+        .card-img-wrapper {
+            position: relative;
+            cursor: pointer;
+            background-color: #14161f;
+        }
+        .card img {
+            width: 100%;
+            height: 340px;
+            object-fit: contain;
+            padding: 10px;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+        .card-img-wrapper:hover img {
+            transform: scale(1.03);
+        }
+        .click-hint {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.75);
+            color: var(--accent);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            pointer-events: none;
+        }
+        .card-body {
+            padding: 20px;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .card-category {
+            font-size: 0.85rem;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+        .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #fff;
+            cursor: pointer;
+        }
+        .card-price {
+            font-size: 1.1rem;
+            color: var(--success);
+            font-weight: bold;
+            margin-bottom: 15px;
+            background: rgba(46, 204, 113, 0.1);
+            padding: 5px;
+            border-radius: 6px;
+        }
+        .order-btn {
+            display: inline-block;
+            background-color: var(--accent);
+            color: #000;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            width: 100%;
+            transition: 0.2s;
+        }
+        .order-btn:hover {
+            opacity: 0.9;
+        }
+        .delete-btn {
+            display: none;
+            background: var(--danger);
+            color: #fff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 8px;
+            width: 100%;
+        }
+        body.is-admin .delete-btn {
+            display: block;
+        }
+
+        /* پەنجەرەی زانیاری دەفتەر (Product Modal) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            border: 2px solid var(--accent);
+            border-radius: 18px;
+            max-width: 650px;
+            width: 100%;
+            max-height: 92vh;
+            overflow-y: auto;
+            padding: 25px 20px;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.9);
+            animation: modalFadeIn 0.25s ease;
+        }
+        @keyframes modalFadeIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .close-modal {
+            position: sticky;
+            top: 0;
+            float: left;
+            background: var(--danger);
+            color: #fff;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-main-img {
+            width: 100%;
+            max-height: 360px;
+            object-fit: contain;
+            background: #14161f;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #2a2d3a;
+        }
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--accent);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .modal-price {
+            font-size: 1.2rem;
+            color: var(--success);
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .specs-box {
+            background: #14161f;
+            border: 1px solid #2a2d3a;
+            border-right: 4px solid var(--accent);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .specs-box p {
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        .specs-box p:last-child {
+            margin-bottom: 0;
+        }
+        .specs-box strong {
+            color: var(--accent);
+        }
+        .paper-section-title {
+            text-align: center;
+            font-size: 1.05rem;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            background: rgba(212, 175, 55, 0.12);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        .paper-types-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .paper-card {
+            background: #14161f;
+            border: 2px solid #2a2d3a;
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .paper-card:hover, .paper-card.active-img {
+            border-color: var(--accent);
+            background: rgba(212, 175, 55, 0.08);
+        }
+        .paper-card img {
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: #0f1016;
+        }
+        .paper-card span {
+            display: block;
+            font-size: 0.92rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        .paper-card small {
+            color: var(--text-gray);
+            font-size: 0.78rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 50px;
+            background-color: #090a0f;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            border-top: 1px solid #222;
+        }
+        #secret-login {
+            cursor: pointer;
+            user-select: none;
+            color: var(--accent);
+        }
+
+        @media (max-width: 480px) {
+            .paper-types-grid {
+                grid-template-columns: 1fr;
+            }
+            .paper-card img {
+                height: 220px;
+                object-fit: contain;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- دوگمەی ٣ هێڵ لە سەرەوە لای ڕاست -->
+    <button class="menu-btn" onclick="toggleMenu()" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <!-- مێنوی لاوەکی سۆشیاڵ میدیا -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar-menu" id="sidebar-menu">
+        <div class="sidebar-header">
+            <h3>پەیوەندی و تۆڕەکان</h3>
+            <button class="close-sidebar" onclick="toggleMenu()">&times;</button>
+        </div>
+        <div class="social-links">
+            <a href="https://www.tiktok.com/@parlit.daftar?_r=1&_t=ZS-9AL5Wd6G21x" target="_blank" class="social-link">
+                <span>تیکتۆک (TikTok)</span>
+                <span class="badge">فۆڵۆمان بکە</span>
+            </a>
+            <a href="https://www.instagram.com/parlit.daftar?stkn=aHBjZjlqMXF5NW8z&utm_source=qr" target="_blank" class="social-link">
+                <span>ئینستاگرام (Instagram)</span>
+                <span class="badge">فۆڵۆمان بکە</span>
+            </a>
+        </div>
+    </div>
+
+    <header>
+        <img src="logo.jpg.JPG" alt="Parlit Logo" class="brand-logo" onerror="this.src='logo.jpg'">
+        <h1>PARLIT</h1>
+        <p>فرۆشگای پەرلیت بۆ دەفتەری ئەرکەکان بە دیزاینی تایبەت و ناوازە</p>
+    </header>
+
+    <div class="container">
+        
+        <div id="admin-panel">
+            <h2>بەشی بەڕێوەبردن (تایبەت بە خاوەنی Parlit)</h2>
+            <div class="form-group">
+                <label>ناوی دەفتەر:</label>
+                <input type="text" id="p-title" placeholder="بۆ نموونە: Arthur Morgan">
+            </div>
+            <div class="form-group">
+                <label>بەش (پۆلێن):</label>
+                <select id="p-category">
+                    <option value="game">یارییەکان</option>
+                    <option value="series">فیلم و زنجیرە</option>
+                    <option value="country">وڵات و مێژوو</option>
+                    <option value="other">جۆری تر</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>نرخ:</label>
+                <input type="text" id="p-price" value="٦,٠٠٠ دینار">
+            </div>
+            <div class="form-group">
+                <label>ناوی فایلی وێنەکە لە گیتهەب:</label>
+                <input type="text" id="p-img" placeholder="بۆ نموونە: KURDSTAN.jpg">
+            </div>
+            <button class="admin-btn" onclick="addProduct()">+ زیادکردنی دەفتەر</button>
+            <button class="admin-btn" style="background:#555; color:#fff;" onclick="logoutAdmin()">داخستنی بەشی ئەدمین</button>
+
+            <div class="export-box">
+                <p style="font-size:0.9rem; color:#ccc; margin-bottom:10px;">
+                    <strong>تێبینی:</strong> دوای زیادکردنی دەفتەر لە ئەدمین، لێرە کۆپی بکە و لە کۆدەکەدا دایبنێ:
+                </p>
+                <button class="admin-btn" style="background:var(--success); color:#fff;" onclick="copyUpdatedList()">کۆپیکردنی لیستی نوێ</button>
+            </div>
+        </div>
+
+        <div class="categories">
+            <button class="cat-btn active" onclick="filterItems('all', event)">هەمووی</button>
+            <button class="cat-btn" onclick="filterItems('game', event)">یارییەکان</button>
+            <button class="cat-btn" onclick="filterItems('series', event)">فیلم و زنجیرە</button>
+            <button class="cat-btn" onclick="filterItems('country', event)">وڵات و مێژوو</button>
+            <button class="cat-btn" onclick="filterItems('other', event)">جۆری تر</button>
+        </div>
+
+        <div class="grid" id="product-grid"></div>
+    </div>
+
+    <!-- پەنجەرەی پیشاندانی زانیاری دەفتەر و ٢ وێنەکەی تر -->
+    <div class="modal-overlay" id="product-modal" onclick="closeModalOnBg(event)">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeProductModal()">&times;</button>
+            
+            <img id="modal-img" src="" alt="Notebook" class="modal-main-img" onerror="this.src='logo.jpg.JPG'">
+            <h2 id="modal-title" class="modal-title"></h2>
+            <div id="modal-price" class="modal-price"></div>
+
+            <div class="specs-box">
+                <p>📄 <strong>ژمارەی پەڕەکان :</strong> ١٢٥ پەڕە ، ٢٥٠ لاپەڕە</p>
+                <p>📏 <strong>قەبارەکان :</strong> A4</p>
+            </div>
+
+            <div class="paper-section-title">
+                لاپەڕەکان بە دوو شێواز بەردەستە ئەوانیش ئەمانەن:
+            </div>
+
+            <div class="paper-types-grid">
+                <div class="paper-card" onclick="previewModalImage(PAPER_IMG_1)">
+                    <img id="paper-img-1" src="" alt="کاغەزی ئەرکەکان" onerror="this.src='logo.jpg.JPG'">
+                    <span>وێنەی یەکەم : کاغەزی ئەرکەکان</span>
+                    <small>(کلیک بکە بۆ گەورەکردن)</small>
+                </div>
+                <div class="paper-card" onclick="previewModalImage(PAPER_IMG_2)">
+                    <img id="paper-img-2" src="" alt="کاغەزی ئاسایی هێڵدار" onerror="this.src='logo.jpg.JPG'">
+                    <span>وێنەی دووەم : کاغەزی ئاسایی هێڵدار</span>
+                    <small>(کلیک بکە بۆ گەورەکردن)</small>
+                </div>
+            </div>
+
+            <div style="text-align:center; margin-bottom:15px;">
+                <button class="cat-btn" id="reset-cover-btn" style="display:none;" onclick="resetToCoverImage()">گەڕانەوە بۆ وێنەی بەرزی دەفتەرەکە</button>
+            </div>
+
+            <a id="modal-order-btn" href="https://www.tiktok.com/@parlit.daftar?_r=1&_t=ZS-9AL5Wd6G21x" class="order-btn" target="_blank" style="text-align:center;">داواکردن لە تیکتۆک</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>هەموو مافێکی پارێزراوە بۆ براندی <strong id="secret-login" onclick="openAdmin()">Parlit &copy; 2026</strong></p>
+    </footer>
+
+    <script>
+        const TIKTOK_LINK = "https://www.tiktok.com/@parlit.daftar?_r=1&_t=ZS-9AL5Wd6G21x";
+
+        // ناوی فایلی دوو وێنەکەی ناوەوەی دەفتەر لێرە دابنێ (لە گیتهەب باربکرێن)
+        const PAPER_IMG_1 = "paper1.jpg"; // وێنەی یەکەم: کاغەزی ئەرکەکان
+        const PAPER_IMG_2 = "paper2.jpg"; // وێنەی دووەم: کاغەزی ئاسایی هێڵدار
+
+        const defaultNotebooks = [
+            { title: "Kurdistan", category: "country", price: "٦,٠٠٠ دینار", img: "KURDSTAN.jpg" },
+            { title: "Germany", category: "country", price: "٦,٠٠٠ دینار", img: "GERMANY.jpg" },
+            { title: "Arthur Morgan", category: "game", price: "٦,٠٠٠ دینار", img: "Arhur.jpg" },
+            { title: "Ezio Auditore", category: "game", price: "٦,٠٠٠ دینار", img: "Ezio.JPG" },
+            { title: "GTA VI", category: "game", price: "٦,٠٠٠ دینار", img: "GTA 6.jpg" },
+            { title: "CJ - Grove Street", category: "game", price: "٦,٠٠٠ دینار", img: "CJ.JPG" },
+            { title: "Forza Horizon 6", category: "game", price: "٦,٠٠٠ دینار", img: "forza horizon 6.JPG" },
+            { title: "Kratos - God of War", category: "game", price: "٦,٠٠٠ دینار", img: "Kratos.jpg" },
+            { title: "Joel - The Last of Us", category: "game", price: "٦,٠٠٠ دینار", img: "joel.jpg" },
+            { title: "Leon S. Kennedy", category: "game", price: "٦,٠٠٠ دینار", img: "leon s..jpg" },
+            { title: "Minecraft", category: "game", price: "٦,٠٠٠ دینار", img: "Minecraft.jpg" },
+            { title: "Patrick Jane", category: "series", price: "٦,٠٠٠ دینار", img: "patrick jane.jpg" },
+            { title: "The Mentalist", category: "series", price: "٦,٠٠٠ دینار", img: "The mentalist.jpg" },
+            { title: "Michael Scofield", category: "series", price: "٦,٠٠٠ دینار", img: "michael scofield.jpg" },
+            { title: "Prison Break", category: "series", price: "٦,٠٠٠ دینار", img: "prison break .JPG" },
+            { title: "Breaking Bad", category: "series", price: "٦,٠٠٠ دینار", img: "breaking baf.JPG" },
+            { title: "Walter White", category: "series", price: "٦,٠٠٠ دینار", img: "walter white .jpg" },
+            { title: "Dexter", category: "series", price: "٦,٠٠٠ دینار", img: "dexter.jpg" },
+            { title: "The Walking Dead", category: "series", price: "٦,٠٠٠ دینار", img: "The walking dead .JPG" },
+            { title: "United Kingdom", category: "country", price: "٦,٠٠٠ دینار", img: "Uk.JPG" },
+            { title: "France", category: "country", price: "٦,٠٠٠ دینار", img: "France.jpg" },
+            { title: "Ancient Rome", category: "country", price: "٦,٠٠٠ دینار", img: "rome.PNG" },
+            { title: "Japan", category: "country", price: "٦,٠٠٠ دینار", img: "japan.jpg" },
+            { title: "Baxay Qasab", category: "other", price: "٦,٠٠٠ دینار", img: "bakhay qasab.JPG" }
+        ];
+
+        let notebooks = JSON.parse(localStorage.getItem('parlit_notebooks_v7')) || defaultNotebooks;
+        let currentFilter = 'all';
+        let currentCoverImg = '';
+
+        const categoryNames = {
+            game: "زنجیرەی یارییەکان",
+            series: "فیلم و زنجیرە",
+            country: "وڵات و مێژوو",
+            other: "دیزاینی تایبەت"
+        };
+
+        function toggleMenu() {
+            document.getElementById('sidebar-menu').classList.toggle('active');
+            document.getElementById('sidebar-overlay').classList.toggle('active');
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+
+            notebooks.forEach((item, index) => {
+                if (currentFilter !== 'all' && item.category !== currentFilter) return;
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-img-wrapper" onclick="openProductModal(${index})">
+                        <img src="${encodeURI(item.img)}" alt="${item.title}" onerror="this.src='logo.jpg.JPG'">
+                        <span class="click-hint">کلیک بکە بۆ زانیاری زیاتر</span>
+                    </div>
+                    <div class="card-body">
+                        <div>
+                            <div class="card-category">${categoryNames[item.category] || 'تایبەت'}</div>
+                            <h3 class="card-title" onclick="openProductModal(${index})">دەفتەری ئەرکەکان - ${item.title}</h3>
+                            <div class="card-price">${item.price || '٦,٠٠٠ دینار'}</div>
+                        </div>
+                        <div>
+                            <a href="${TIKTOK_LINK}" class="order-btn" target="_blank">داواکردن</a>
+                            <button class="delete-btn" onclick="deleteProduct(${index})">سڕینەوە</button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openProductModal(index) {
+            const item = notebooks[index];
+            currentCoverImg = encodeURI(item.img);
+
+            document.getElementById('modal-img').src = currentCoverImg;
+            document.getElementById('modal-title').innerText = `دەفتەری ئەرکەکان - ${item.title}`;
+            document.getElementById('modal-price').innerText = item.price || '٦,٠٠٠ دینار';
+            
+            document.getElementById('paper-img-1').src = encodeURI(PAPER_IMG_1);
+            document.getElementById('paper-img-2').src = encodeURI(PAPER_IMG_2);
+            document.getElementById('reset-cover-btn').style.display = 'none';
+
+            document.getElementById('product-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function previewModalImage(imgSrc) {
+            document.getElementById('modal-img').src = encodeURI(imgSrc);
+            document.getElementById('reset-cover-btn').style.display = 'inline-block';
+        }
+
+        function resetToCoverImage() {
+            document.getElementById('modal-img').src = currentCoverImg;
+            document.getElementById('reset-cover-btn').style.display = 'none';
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeModalOnBg(event) {
+            if (event.target.id === 'product-modal') {
+                closeProductModal();
+            }
+        }
+
+        function filterItems(cat, event) {
+            currentFilter = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderProducts();
+        }
+
+        function openAdmin() {
+            const pass = prompt("تکایە وشەی نهێنی (Password)ی ئەدمین بنووسە:");
+            if (pass === "parlit2026") {
+                document.getElementById('admin-panel').style.display = 'block';
+                document.body.classList.add('is-admin');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else if (pass !== null) {
+                alert("وشەی نهێنی هەڵەیە!");
+            }
+        }
+
+        function logoutAdmin() {
+            document.getElementById('admin-panel').style.display = 'none';
+            document.body.classList.remove('is-admin');
+        }
+
+        function addProduct() {
+            const title = document.getElementById('p-title').value.trim();
+            const category = document.getElementById('p-category').value;
+            const price = document.getElementById('p-price').value.trim() || "٦,٠٠٠ دینار";
+            const img = document.getElementById('p-img').value.trim();
+
+            if (!title || !img) {
+                alert("تکایە بەلایەنی کەمەوە ناوی دەفتەر و ناوی وێنەکە بنووسە!");
+                return;
+            }
+
+            notebooks.unshift({ title, category, price, img });
+            localStorage.setItem('parlit_notebooks_v7', JSON.stringify(notebooks));
+            renderProducts();
+
+            document.getElementById('p-title').value = '';
+            document.getElementById('p-img').value = '';
+            alert("دەفتەرەکە بە سەرکەوتوویی زیاد کرا!");
+        }
+
+        function deleteProduct(index) {
+            if (confirm("دڵنیایت دەتەوێت ئەم دەفتەرە بسڕیتەوە؟")) {
+                notebooks.splice(index, 1);
+                localStorage.setItem('parlit_notebooks_v7', JSON.stringify(notebooks));
+                renderProducts();
+            }
+        }
+
+        function copyUpdatedList() {
+            const codeString = `const defaultNotebooks = ${JSON.stringify(notebooks, null, 4)};`;
+            navigator.clipboard.writeText(codeString).then(() => {
+                alert("لیستی نوێ کۆپی کرا!");
+            });
+        }
+
+        renderProducts();
+    </script>
+</body>
+</html>
